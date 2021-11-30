@@ -50,7 +50,7 @@ module Mux_pc(pc_out, reset_pc, next_pc); // logic for multiplexer before the PC
   input reset_pc;
   output wire [8:0] next_pc;
   
-  assign next_pc = (reset) ? 8'b00000000 : (out_pc + 1'b1) ; // when reset  = 0 , value going int0 PC is incremented, such that PC stores address of next instruction
+  assign next_pc = (reset) ? 9'b00000000 : (out_pc + 1'b1) ; // when reset  = 0 , value going int0 PC is incremented, such that PC stores address of next instruction
 
 endmodule
 
@@ -59,7 +59,7 @@ module Mux_memory(pc_out, addr_sel, mem_addr);
   input addr_sel;
   output wire [8:0] mem_addr;
   
-  assign mem_addr = (addr_sel)? pc_out : 8'b00000000;
+  assign mem_addr = (addr_sel)? pc_out : 9'b00000000;
   
 endmodule
 
