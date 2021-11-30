@@ -1,4 +1,4 @@
-module ins_register(in,load,clk,in_out);
+module ins_register(read_data,load_ir,clk,in_out);
 input clk, load;
 input [15:0] in;
 output reg[15:0] in_out;
