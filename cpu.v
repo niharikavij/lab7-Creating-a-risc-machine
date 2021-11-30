@@ -18,11 +18,13 @@ wire [15:0] sximm8, sximm5,in_out;
 ins_register IR(read_data,load_ir,clk,in_out);
 ins_decoder ID(in_out,nsel,sximm5,sximm8,opcode,op,shift,ALUop,readnum,writenum);
 state_machine SM(reset,clk,opcode,op,write,vsel,loada,loadb,loadc,loads,asel,bsel,nsel,load_pc,reset_pc,load_ir,addr_sel,mem_cmd);
-datapath DP(sximm8,sximm5,vsel,loada,loadb,shift,bsel,asel,ALUop,loads,loadc,clk,writenum,write,readnum,Z_out,datapath_out);
+datapath DP(mdata,sximm8,sximm5,vsel,loada,loadb,shift,bsel,asel,ALUop,loads,loadc,clk,writenum,write,readnum,Z_out,datapath_out);
 Mux_pc MPC(pc_out, reset_pc, next_pc);
 Mux_memory MMEM(pc_out, addr_sel, mem_addr);
-PC PC(next_pc, pc_out, load_pc,clk);
+PC PC(next_pc, pc_out, load_pc, clk);
 
+assign mdata = read_data;
+assign datapath_out = write_data; 
 endmodule 
 
 module PC(next_pc, pc_out, load_pc, clk); // logic for program counter
