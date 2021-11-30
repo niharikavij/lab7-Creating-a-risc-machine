@@ -1,9 +1,12 @@
-module cpu(clk,reset,read_data,mem_cmd,mem_addr);
+module cpu(clk,reset,read_data,mem_cmd,mem_addr, mdata, datapath_out);
 input wire clk, reset;
 input [15:0] read_data;
+input [15:0] mdata;
+
 
 output [1:0] mem_cmd;
 output [8:0] mem_addr;
+output [15:0] datapath_out;
 
 wire[15:0] datapath_out;
 wire[2:0] Z_out;
@@ -20,11 +23,11 @@ ins_decoder ID(in_out,nsel,sximm5,sximm8,opcode,op,shift,ALUop,readnum,writenum)
 state_machine SM(reset,clk,opcode,op,write,vsel,loada,loadb,loadc,loads,asel,bsel,nsel,load_pc,reset_pc,load_ir,addr_sel,mem_cmd);
 datapath DP(mdata,sximm8,sximm5,vsel,loada,loadb,shift,bsel,asel,ALUop,loads,loadc,clk,writenum,write,readnum,Z_out,datapath_out);
 Mux_pc MPC(pc_out, reset_pc, next_pc);
-Mux_memory MMEM(pc_out, addr_sel, mem_addr);
+Mux_memory MMEM(pc_out, addr_sel, mem_addr, clk, datapath_out, mem_addr);
 PC PC(next_pc, pc_out, load_pc, clk);
 
-assign mdata = read_data;
-assign datapath_out = write_data; 
+assign read_data = mdata;
+assign write_data = datapath_out; 
 endmodule 
 
 module PC(next_pc, pc_out, load_pc, clk); // logic for program counter
@@ -47,10 +50,18 @@ module Mux_pc(pc_out, reset_pc, next_pc); // logic for multiplexer before the PC
 
 endmodule
 
-module Mux_memory(pc_out, addr_sel, mem_addr);
+module memory(pc_out, addr_sel, mem_addr, clk, datapath_out, load_addr);
   input [8:0] pc_out;
-  input addr_sel;
+  input addr_sel, clk;
+  input load_addr;
+  input [15:0]datapath_out;
   output wire [8:0] mem_addr;
-  
-  assign mem_addr = (addr_sel)? pc_out : 8'b00000000;
+  reg [8:0] mux_in;
+ 
+
+  always@(posedge clk)begin
+  mux_in = (load_addr) ? datapath_out[8:0] : mux_in;
+  end
+
+assign mem_addr = (addr_sel)? pc_out : mux_in;
 endmodule
