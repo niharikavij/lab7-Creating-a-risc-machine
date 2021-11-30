@@ -62,4 +62,11 @@ module Mux_memory(pc_out, addr_sel, mem_addr);
   assign mem_addr = (addr_sel)? pc_out : 8'b00000000;
 endmodule
 
-module tri_state(
+module tri_state();
+  input [15:0] dout;
+  input AND_out;
+  output [15: 0] read_data
+  
+  assign read_data = (AND_out) ? dout : {16{1'bz}};
+  
+endmodule
