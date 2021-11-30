@@ -1,19 +1,21 @@
-module state_machine(reset,clk,opcode,op,write,w,vsel,loada,loadb,loadc,loads,asel,bsel,nsel,load_pc,reset_pc,load_ir,addr_sel,mem_cmd, mem_addr);
+module state_machine(reset,clk,opcode,op,write,vsel,loada,loadb,loadc,loads,asel,bsel,nsel,load_pc,reset_pc,load_ir,addr_sel,mem_cmd);
 input reset,clk;
 input[2:0] opcode;
 input[1:0] op;
-output reg w,write, loada, loadb, loadc, loads, vsel,asel,bsel,load_ir,load_pc,reset_pc,addr_sel;
+output reg write, loada, loadb, loadc, loads, vsel,asel,bsel,load_ir,load_pc,reset_pc,addr_sel;
 output reg [1:0]mem_cmd;
-output reg [8:0]mem_addr;
 output reg [2:0] nsel;
 reg [3:0] state;
 
 // starts state if reach decode state 
 always @(posedge clk) begin
-	state = reset ? 4'b0000 : state; // if reset, state return to "reset" state 4'b0000
-	case(state)
-		4'b0000: state = 4'b1011; // if in 'reset' state, go tp "IF1" state 4'b1000
-		4'b1000: state = 4'b1001; // if in 'IF1' state, go to "IF2" state 4'b1001
+	if(reset == 1'b1)begin
+	state =  4'b0000; // if reset, state return to "reset" state 4'b0000
+	end 
+	else begin 
+		case(state)
+		4'b0000: state = 4'b1011; // if in 'reset' state, go tp "IF1" state 4'b1011
+		4'b1011: state = 4'b1001; // if in 'IF1' state, go to "IF2" state 4'b1001
 		4'b1001: state = 4'b1010; // if in "IF2" state, go to 'updatePC' state 4'b1010
 		4'b1010: state = 4'b0001 ; // if in 'updatePC' state, go to 'decode' state 
 		4'b0001: state = (opcode == 3'b110 & op == 2'b10) ? 4'b0010 : 4'b0011; // in 'decode' state, go to 'write imme' state else 'Get A Rn'
@@ -32,11 +34,11 @@ always @(posedge clk) begin
 		4'b0110: state = 4'b1011; //if in 'write Rd' state, go to 'IF1' state
 		default: state = state; 
 	endcase
+	end 
 	state = state;
 end
 
 always @(*) begin
-	w = (state == 4'b0000) ? 1'b1: 1'b0; 
 	// outputs in the state machine 
 	case(state)
 		4'b0000:begin // in 'reset' state
