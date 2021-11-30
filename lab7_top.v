@@ -41,7 +41,8 @@ module PC(next_pc, pc_out, load_pc); // logic for program counter
   
   always@(posedge clk) begin //dependent on clock
    pc_out = (load_pc) ? next_pc: pc_out;
-          
+  end 
+  
 endmodule
 
 module Mux_pc(pc_out, reset_pc, next_pc); // logic for multiplexer before the PC
