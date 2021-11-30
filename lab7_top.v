@@ -12,8 +12,8 @@ wire write,clk;
 
 cpu CPU(clk,reset,read_data,mem_cmd,mem_addr);
 RAM MEM(.clk(~KEY[0]),.read_address(SW),.read_address(SW),write,din,dout);
-
-
+tri_state TS(dout, AND_out, read_data);
+ANDgate  AND(mem_cmd, mem_addr, AND_out);
 endmodule
 
 
@@ -34,4 +34,4 @@ module ANDgate(mem_cmd, mem_addr, AND_out);
   output wire AND_out;
   
   assign AND_out = ((mem_cmd == 2'b01) & (mem_addr[8] == 1'b1))? 1'b1 : 1'b0 ;
-endmodule
+endmodule 
