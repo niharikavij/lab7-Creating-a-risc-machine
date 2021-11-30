@@ -21,6 +21,6 @@ state_machine SM(reset,clk,opcode,op,write,vsel,loada,loadb,loadc,loads,asel,bse
 datapath DP(sximm8,sximm5,vsel,loada,loadb,shift,bsel,asel,ALUop,loads,loadc,clk,writenum,write,readnum,Z_out,datapath_out);
 Mux_pc MPC(pc_out, reset_pc, next_pc);
 Mux_memory MMEM(pc_out, addr_sel, mem_addr);
-PC PC(next_pc, pc_out, load_pc);
+  PC PC(next_pc, pc_out, load_pc,clk);
 
 endmodule 
