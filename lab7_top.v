@@ -26,3 +26,12 @@ module tri_state(dout, AND_out, read_data);
   assign read_data = (AND_out) ? dout : {16{1'bz}};
   
 endmodule
+
+
+module ANDgate(mem_cmd, mem_addr, AND_out);
+  input [1:0] mem_cmd;
+  input [8:0] mem_addr;
+  output wire AND_out;
+  
+  assign AND_out = ((mem_cmd == 2'b01) & (mem_addr == 1'b1))? 1'b1 : 1'b0 ;
+endmodule
