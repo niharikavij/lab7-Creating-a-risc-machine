@@ -33,5 +33,5 @@ module ANDgate(mem_cmd, mem_addr, AND_out);
   input [8:0] mem_addr;
   output wire AND_out;
   
-  assign AND_out = ((mem_cmd == 2'b01) & (mem_addr == 1'b1))? 1'b1 : 1'b0 ;
+  assign AND_out = ((mem_cmd == 2'b01) & (mem_addr[8] == 1'b1))? 1'b1 : 1'b0 ;
 endmodule
