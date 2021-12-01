@@ -1,0 +1,9 @@
+MOV R0, #7 //#0 pass
+MOV R1, #2 //#1 pass
+ADD R2, R1, R0, LSL #1 //#2 pass
+CMP R1, R0 // Negative, #3 fail , shouldn't change values in Rn, pass
+AND R5, R1, R2 // #4, pass
+MVN R3, R1 // #5, pass
+LDR R4, [R1,#3] //R1+3 = 5, R4 = instruction code of MVN R3, R1, #6, pass
+STR R3, [R0, #2]// store R3 into M[9], #7, pass
+STR R1,[R1] // try overwritten, M[2] = 2 ,pass
