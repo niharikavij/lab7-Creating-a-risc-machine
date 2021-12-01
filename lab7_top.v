@@ -10,7 +10,7 @@ wire clk;
 reg [15:0]read_data,din;
 reg write;
 
-cpu CPU(clk,reset,read_data,mdata,mem_cmd,mem_addr,write_data,datapath_out);
+cpu CPU(clk,reset,read_data,mem_cmd,mem_addr,write_data);
 RAM MEM(clk,read_address,write_address,write,din,dout);
 always @(*)begin
 	read_address = mem_addr;
