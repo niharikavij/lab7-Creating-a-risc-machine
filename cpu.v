@@ -1,11 +1,12 @@
-module cpu(clk,reset,read_data,mdata,mem_cmd,mem_addr,write_data,datapath_out);
+module cpu(clk,reset,read_data,mem_cmd,mem_addr,write_data);
 input wire clk, reset;
-input [15:0] read_data,mdata;
+input [15:0] read_data;
+
 output [1:0] mem_cmd;
 output [8:0] mem_addr;
-output [15:0] write_data,datapath_out;
+output reg [15:0] write_data;
 
-wire[15:0] datapath_out,mdata;
+wire[15:0] datapath_out,sximm8, sximm5,in_out;
 wire[2:0] Z_out;
 wire write, loada, loadb, loadc, loads,asel,bsel, load_ir,reset_pc, load_pc, addr_sel,load_addr;
 wire [1:0] shift, ALUop,op,vsel;
@@ -13,7 +14,7 @@ wire [2:0] nsel,Rd,Rn,Rm,readnum,writenum,opcode;
 wire [8:0] next_pc,pc_out;
 reg [4:0] imm5;
 reg [7:0] imm8;
-wire [15:0] sximm8, sximm5,in_out;
+reg[15:0] mdata;
 
 ins_register IR(read_data,load_ir,clk,in_out);
 ins_decoder ID(in_out,nsel,sximm5,sximm8,opcode,op,shift,ALUop,readnum,writenum);
@@ -23,6 +24,8 @@ Mux_pc MPC(pc_out, reset_pc, next_pc);
 memory MMEM(pc_out, addr_sel, mem_addr, clk, datapath_out, load_addr);
 PC PC(next_pc, pc_out, load_pc, clk); 
 
-assign mdata = read_data;
-assign write_data = datapath_out;
+always @(*)begin
+	 mdata = read_data;
+	 write_data = datapath_out;
+end 
 endmodule 
