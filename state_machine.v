@@ -28,15 +28,20 @@ always @(posedge clk) begin
 				state = 5'b00011;  //  go to 'Get A Rn' state 
 
 		end 
-		//in 'Get B Rn' state
-		5'b01101: state = 5'b01110; // go to 'GET sximm5' 
-		//in 'get sximm5' state 
-		5'b01110: state = 5'b00111; // go to 'ALU' state
+		//in 'get sximm5 in ALU' state 
+		5'b01110: begin  
+			if(opcode == 3'b011)
+				state = 5'b10010;// go to 'load mem addr' state 
+			else if(opcode == 3'b100)
+				state = 5'b10001;//go to 'write to ram' state 
+			else 
+				state = 5'b00110; // go to 'write Rd' state 
+		end 
 		5'b00010: state = 5'b01000; // if in 'write imme' state, go to 'IF1' state 
 		//in 'Get A Rn' state
-		5'b00011:begin
-			if (opcode  == 3'b011 | opcode == 3'b100)
-				state = 5'b01110; // go to 'GET sximm5'
+		5'b00011: begin 
+			if(opcode == 3'b011 | opcode == 3'b100) 
+				state = 5'b01110; // go to 'sximm5 in ALU' 
 			else 
 				state = 5'b00100; //go to 'Bet B Rm' state
 		end 
@@ -46,21 +51,18 @@ always @(posedge clk) begin
 			else if(opcode == 3'b101) 
 				state = (op == 2'b01) ? 5'b01000 : 5'b00111; //if CMP Rn, Rm{,<sh_op>}, go to 'status' state, else go to 'ALU' state
 		end
+		// in 'load mem addr' state 
+		5'b10010: state = 5'b01111; // go to 'get ram value' state
 		5'b00101: state = 5'b00110; //if in 'shift' state, go to 'write Rd' state 
 		5'b00110: state = 5'b01011; //if in 'write Rd' state, go to 'IF1' state
 		5'b01000: state = 5'b01011; //if in 'status' state, go to 'IF1' state
 		//in 'ALU' state
-		5'b00111: begin 
-			  if(opcode == 3'b011)
-				state = 5'b01111; // go to 'get ram add' state
-			  else if(opcode == 3'b100)
-				state = 5'b10001;//go to 'write to ram' state 
-			  else 
-				state = 5'b00110; // go to 'write Rd' state 
-		end 
+		5'b00111: state = 5'b00110; // go to 'write Rd' state 
 		//in 'get ram add' state'
-		5'd01111: state = 5'b10000;//go to 'write ram' state 
+		5'b01111: state = 5'b10000;//go to 'write ram' state 
 		5'b00110: state = 5'b01011; //if in 'write Rd' state, go to 'IF1' state
+		5'b10001: state = 5'b01011; // if in 'write to ram' state, go to 'IF1' state
+		5'b10000: state = 5'b01011; // if in 'write ram' state, go to 'IF1' state
 		default: state = state; 
 	endcase
 	end 
@@ -148,29 +150,35 @@ always @(*) begin
 			nsel = 3'b000;
 			mem_cmd = 2'b00; // WNONE
 		end 
-		5'b01110:begin// "get sximm5" state 
-			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b010001000;
+		5'b01110:begin// "sximm5 in ALU" state 
+			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b001001000;
 			{write,vsel,reset_pc,load_addr}= 5'b00000;
-			nsel = 3'b001;
+			nsel = 3'b000;
 			mem_cmd = 2'b00; // WNONE
 		end 
-		5'b01111:begin // 'Get ram add' state
-			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b001000000;
+		5'b01111:begin // 'Get ram value' state
+			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b000000000;
 			{write,vsel,reset_pc,load_addr}= 5'b00001;
-			nsel = 3'b001;
+			nsel = 3'b000;
 			mem_cmd = 2'b10; // Wread
 		end 
-		5'b10000:begin//'write ram' state 
+		5'b10000:begin//'write ram to register' state 
 			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b000000000;
-			{write,vsel,reset_pc,load_addr}= 5'b11000; // write, vsel = ram addr
+			{write,vsel,reset_pc,load_addr}= 5'b11000; // write, vsel = mdata
 			nsel = 3'b010;//write to rd
 			mem_cmd = 2'b10; // Wread
 		end 
-		5'b10001:begin// 'write to ram state'
+		5'b10001:begin// 'write to ram' state
 			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b000000000;
 			{write,vsel,reset_pc,load_addr}= 5'b00001; // write, vsel = ram addr
 			nsel = 3'b000;//NONE
 			mem_cmd = 2'b10; // WRITE
+		end 
+		5'b10010:begin// 'load mem_addr' state
+			{loada,loadb,loadc,loads,asel,bsel,load_ir,load_pc,addr_sel} = 9'b000000000;
+			{write,vsel,reset_pc,load_addr}= 5'b00001; // write, vsel = ram addr
+			nsel = 3'b000;//NONE
+			mem_cmd = 2'b00; // WNONE
 		end 
 	endcase 
 end 
