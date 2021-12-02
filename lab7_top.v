@@ -32,4 +32,11 @@ always@(*) begin
 	end
 	else LEDR[7:0] = LEDR[7:0];
 end
+	
+always @(*) begin
+	load_input = ((mem_cmd == 2'b01) & (mem_addr == 9'h140)) ? 1'b1 : 1'b0;
+	read_data [7:0] = (load_input == 1'b1) ? SW[7:0] : read_data;
+	read_data [15:8] = (load_input == 1'b1) ? {8'h00} : read_data; 
+	
+end 
 endmodule				
