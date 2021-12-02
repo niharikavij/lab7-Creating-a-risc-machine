@@ -8,10 +8,10 @@ wire [1:0]mem_cmd;
 wire [8:0]mem_addr;
 wire [15:0]dout,write_data,datapath_out,mdata;
 reg [8:0]write_address,read_address; 
-wire clk;
+wire clk, reset;
 
 reg [15:0]read_data,din;
-reg write;
+reg write, load_input;
 
 cpu CPU(clk,reset,read_data,mem_cmd,mem_addr,write_data);
 RAM MEM(clk,read_address,write_address,write,din,dout);
@@ -22,5 +22,11 @@ always @(*)begin
 	read_data = ((mem_cmd == 2'b01) & (mem_addr[8] == 1'b0)) ? dout : {16{1'bz}};
 	din = write_data;
 end 
-
+	
+always @(*) begin
+	load_input = ((mem_cmd == 2'b01) & (mem_addr == 9'h140)) ? 1'b1 : 1'b0;
+	read_data [7:0] = (load_input == 1'b1) ? SW[7:0] : read_data;
+	read_data [15:8] = (load_input == 1'b1) ? {8'h00} : read_data; 
+	
+end 
 endmodule 
