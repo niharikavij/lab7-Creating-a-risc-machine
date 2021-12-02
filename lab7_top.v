@@ -14,10 +14,10 @@ reg [15:0]read_data,din;
 reg write;
 
 	cpu CPU(.clk(~KEY[0]),.reset(~KEY[1]),read_data,mem_cmd,mem_addr,write_data);
-RAM MEM(clk,read_address,write_address,write,din,dout);
+	RAM MEM(.clk(~KEY[0]),read_address,write_address,write,din,dout);
 always @(*)begin
-	read_address = mem_addr;
-	write_address = mem_addr; 
+	read_address = mem_addr[7:0];
+	write_address = mem_addr[7:0]; 
 	write = ((mem_cmd == 2'b10) & (mem_addr[8] == 1'b0)) ? 1'b1 : 1'b0;
 	read_data = ((mem_cmd == 2'b01) & (mem_addr[8] == 1'b0)) ? dout : {16{1'bz}};
 	din = write_data;
