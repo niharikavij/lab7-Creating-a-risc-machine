@@ -28,8 +28,10 @@ always @(posedge clk) begin
 				state = 5'b01100; //go to 'HALT' state if opcode == 111
 			else if(opcode == 3'b110 & op == 2'b10)
 				state = 5'b00010; // go to 'write imme' state 
-			else 
+			else if(opcode == 3'b110 | opcode == 3'b101 | opcode == 3'b011 | opcode == 3'b100)
 				state = 5'b00011;  //  go to 'Get A Rn' state 
+			else 
+				state = 5'b01011; // if not an instruction, go to IF1
 
 		end 
 		//in 'get sximm5 in ALU' state 
