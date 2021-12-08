@@ -21,6 +21,7 @@ module ALU(Ain,Bin,ALUop,out,Z);
 		Z[1] = (out[15] == 1'b1) ? 1'b1 : 1'b0; //N
 		if(ALUop == 2'b00 | ALUop == 2'b01) //V
 			Z[2] = ((~(sign_A ^ sign_B)) & (sign_A ^ sign_R)) ? 1'b1 : 1'b0;
-
+		else 
+			Z[2] = 1'b0;
 	end 
 endmodule 
